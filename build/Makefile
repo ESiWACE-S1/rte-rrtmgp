@@ -5,12 +5,20 @@ RRTMGP_DIR = ../rrtmgp
 #
 # Choose kernels depending on environment variable
 #
+
 ifeq ($(RTE_KERNELS), openacc)
   RTE_KERNEL_DIR    = ../rte/kernels-openacc
   RRTMGP_KERNEL_DIR = ../rrtmgp/kernels-openacc
 endif
-RTE_KERNEL_DIR += ../rte/kernels
-RRTMGP_KERNEL_DIR += ../rrtmgp/kernels
+
+ifeq ($(RTE_KERNELS), cuda)
+  RTE_KERNEL_DIR    = ../rte/kernels-cuda
+  RRTMGP_KERNEL_DIR = ../rrtmgp/kernels-openacc
+endif
+
+RTE_KERNEL_DIR     += ../rte/kernels
+RRTMGP_KERNEL_DIR  += ../rrtmgp/kernels
+
 VPATH = $(RTE_DIR):$(RTE_KERNEL_DIR):$(RRTMGP_DIR):$(RRTMGP_KERNEL_DIR)
 #
 # Compiler variables FC, FCFLAGS must be set in the environment
@@ -23,7 +31,16 @@ COMPILE = $(FC) $(FCFLAGS) $(FCINCLUDE) -c
 %.o: %.F90
 	$(COMPILE) $<
 
+CCOMPILE = $(CC) $(CFLAGS) -std=c++14 -I$(RTE_DIR) -c
+%.o: %.cu
+	$(CCOMPILE) $<
+
+ifeq ($(RTE_KERNELS), cuda)
+include ../rte/kernels-cuda/Make.depends
+else
 include $(RTE_DIR)/Make.depends
+endif
+
 include $(RRTMGP_DIR)/Make.depends
 
 librte.a: $(RTE_FORTRAN_KERNELS) $(RTE_FORTRAN_INTERFACE)

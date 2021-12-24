@@ -16,6 +16,11 @@ FCINCLUDE += -I$(RRTMGP_BUILD)
 FCINCLUDE += -I$(NFHOME)/include
 LDFLAGS   += -L$(NFHOME)/lib -L$(NCHOME)/lib
 LIBS      += -lnetcdff -lnetcdf
+ifeq ($(RTE_KERNELS), cuda)
+    LDFLAGS += -Mcuda -acc
+	LIBS  += -lcudart -lstdc++
+endif
+
 
 VPATH = ../:$(RRTMGP_ROOT)/extensions/cloud_optics
 

@@ -16,6 +16,9 @@ FCINCLUDE += -I$(RRTMGP_BUILD)
 FCINCLUDE += -I$(NFHOME)/include
 LDFLAGS   += -L$(NFHOME)/lib -L$(NCHOME)/lib
 LIBS      += -lnetcdff -lnetcdf
+ifeq ($(RTE_KERNELS), cuda)
+	LIBS  += -lcudart -lstdc++
+endif
 
 #
 # General Purpose Timing Library https://jmrosinski.github.io/GPTL/
@@ -73,4 +76,5 @@ multiple_input4MIPs_radiation_RFMIP_UColorado-RFMIP-1-2_none.nc:
 	bash ./stage_files.sh
 
 clean:
-	-rm rrtmgp_rfmip_sw rrtmgp_rfmip_lw *.o *.mod *.optrpt *.nc
+#	-rm rrtmgp_rfmip_sw rrtmgp_rfmip_lw *.o *.mod *.optrpt *.nc
+	-rm rrtmgp_rfmip_sw rrtmgp_rfmip_lw *.o *.mod *.optrpt
